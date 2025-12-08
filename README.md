@@ -1,18 +1,14 @@
-# AdaSpace3D
-The definitive firmware for DIY SpaceMice. Replaces glitchy mouse/keyboard emulation with Native 3DConnexion driver support. Compatible with both the original Salim Benbouzid design and modern remixes. Features smooth 5DOF control, reactive LED feedback, and auto-wiring detection.
-
-
 # AdaSpace3D 🚀
 
-**The definitive firmware upgrade for DIY SpaceMice.**
+**The definitive firmware upgrade for your DIY SpaceMouse.**
 
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/) ![Platform](https://img.shields.io/badge/platform-RP2040-red.svg) ![Status](https://img.shields.io/badge/status-Stable-green.svg)
 
-Originally developed for **Leo SpaceLab's** design, **AdaSpace3D** is a drop-in firmware replacement for any DIY SpaceMouse using an **RP2040** and **TLx493D** sensor.
+**AdaSpace3D** is a drop-in firmware replacement for any DIY SpaceMouse using an **RP2040** and **TLx493D** sensor.
 
 It fixes the biggest issue with previous DIY firmwares: **It replaces glitchy mouse/keyboard emulation with Native 3DConnexion Driver Support.**
 
-Your DIY build will now be recognized by Windows/macOS as a genuine **SpaceMouse Pro Wireless**. No more glitchy shortcuts, no more keybinding headaches—just buttery smooth 5DOF navigation in Fusion360, Blender, SolidWorks, and more.
+Your DIY build will now be recognized by Windows/macOS as a genuine **SpaceMouse Pro Wireless**. No more glitchy shortcuts, no more keybinding headaches—just buttery smooth 5DOF navigation in 3D software (Fusion360, OrcaSlicer, Blender, etc.).
 
 ---
 
@@ -79,3 +75,31 @@ You can tweak the feel of your SpaceMouse without touching the complex code.
 #define LED_COLOR_R         0
 #define LED_COLOR_G         255
 #define LED_COLOR_B         255
+```
+
+
+
+
+## 🤝 Credits & Acknowledgments
+
+This project stands on the shoulders of giants in the DIY community.
+
+* **Salim Benbouzid:** For setting the seed and inspiring the DIY SpaceMouse revolution.
+* **AndunHH:** For his excellent work on the software side, proving the concept of using the Infineon sensor for navigation.
+* **Leo SpaceLab:** For refining the mechanical design that brought us all here.
+
+**Developed with ❤️ for the maker community by Axiom3d (aka Uzzo)**
+
+
+
+
+This work is licensed under a **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (CC BY-NC-SA 4.0)**.
+
+You are free to:
+* **Share:** Copy and redistribute the material in any medium or format.
+* **Adapt:** Remix, transform, and build upon the material.
+
+Under the following terms:
+* **Attribution:** You must give appropriate credit to the original authors.
+* **NonCommercial:** You may not use the material for commercial purposes.
+* **ShareAlike:** If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
