@@ -3,9 +3,10 @@
 # ============================================================
 # A self-contained build system that:
 # 1. Downloads Arduino CLI if needed
-# 2. Installs required cores and libraries
-# 3. Compiles with custom USB descriptors for 3DConnexion
-# 4. Auto-flashes to RP2040 in bootloader mode
+# 2. Configures Board Manager URLs (CRITICAL FIX)
+# 3. Installs required cores and libraries
+# 4. Compiles with custom USB descriptors for 3DConnexion
+# 5. Auto-flashes to RP2040 in bootloader mode
 # ============================================================
 
 # Get script root - use current location since FLASH.bat sets it
@@ -147,11 +148,25 @@ function Ensure-ArduinoCLI {
         Write-Success "Arduino CLI installed successfully!"
     }
 }
+
 # ============================================================
 # STEP 2: Install Dependencies (Core & Libraries)
 # ============================================================
 function Install-Dependencies {
     Write-Step "2" "Installing Dependencies"
+    
+    # --- CRITICAL FIX: Add Third-Party Board URL ---
+    # We must tell Arduino CLI where to find the RP2040 core
+    $EARLE_URL = "https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json"
+    
+    # Initialize config if missing
+    if (-not (Test-Path "$TOOLS_DIR\arduino-cli.yaml")) {
+        & $ARDUINO_CLI config init --dest-dir "$TOOLS_DIR" | Out-Null
+    }
+    
+    Write-Info "Configuring Board Manager..."
+    # We use 'set' to ensure it's there
+    & $ARDUINO_CLI config set board_manager.additional_urls $EARLE_URL | Out-Null
     
     # Update core index
     Write-Info "Updating Arduino core index..."
@@ -177,7 +192,7 @@ function Install-Dependencies {
             Write-Info "Installing $lib..."
             & $ARDUINO_CLI lib install $lib 2>&1 | Out-Null
             if ($LASTEXITCODE -ne 0) {
-                Exit-WithError "Failed to install $lib"
+                 Exit-WithError "Failed to install $lib"
             }
         }
         Write-Success "$lib is ready."
@@ -249,35 +264,6 @@ function Setup-ShadowBuild {
     Write-Info "  - $USER_CONFIG"
 }
 
-
-============================================================
- STEP 3.5 : Preparing the RP2040 Environment 🛠️
-============================================================
-
-Write-Host "[INFO] Ensuring the Raspberry Pi RP2040 platform is installed."
-
-# 1. Add the 3rd-party URL for the RP2040 platform index.
-# This makes the rp2040 core discoverable by the CLI.
-Write-Host "[INFO] 1/3: Adding board manager URL..."
-try {
-    arduino-cli config add board_manager.additional_urls https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json | Out-Null
-} catch {
-    Write-Host "[WARNING] Failed to add URL. It might already be present."
-}
-
-# 2. Update the local index to recognize the new URL.
-Write-Host "[INFO] 2/3: Updating board index..."
-arduino-cli core update-index
-
-# 3. Install the missing RP2040 platform core.
-# The 'rp2040:rp2040' is the required core package name.
-Write-Host "[INFO] 3/3: Installing RP2040 core (this may take a moment)..."
-arduino-cli core install rp2040:rp2040
-
-Write-Host "[INFO] RP2040 Platform Core is now installed and ready."
-
-
-
 # ============================================================
 # STEP 4: Compile with Custom USB Descriptors
 # ============================================================
@@ -294,18 +280,16 @@ function Compile-Firmware {
     $fqbn = "${BOARD_FQBN}:usbstack=$USB_STACK"
     
     # --- FIXED FLAGS FOR COMPILER ---
-    # We removed the 'extra_flags' injection because it broke handling of spaces in the Product Name.
     # We now rely on standard build properties which the RP2040 core handles natively.
     
-    $propVid = "build.vid=$USB_VID"
-    $propPid = "build.pid=$USB_PID"
-    $propUsbVid = "build.usbvid=-DUSBD_VID=$USB_VID"
-    $propUsbPid = "build.usbpid=-DUSBD_PID=$USB_PID"
+    $propVid       = "build.vid=$USB_VID"
+    $propPid       = "build.pid=$USB_PID"
+    $propUsbVid    = "build.usbvid=-DUSBD_VID=$USB_VID"
+    $propUsbPid    = "build.usbpid=-DUSBD_PID=$USB_PID"
     
     # Careful quoting for properties with spaces
-    # PowerShell will pass these as: build.usb_product="SpaceMouse Pro Wireless"
-    $propProduct = "build.usb_product=\`"$USB_PRODUCT\`""
-    $propMfg = "build.usb_manufacturer=\`"$USB_MANUFACTURER\`""
+    $propProduct   = "build.usb_product=\`"$USB_PRODUCT\`""
+    $propMfg       = "build.usb_manufacturer=\`"$USB_MANUFACTURER\`""
     
     # Build the argument string manually to handle paths with spaces correctly
     $argString = "compile --fqbn `"$fqbn`" " +
@@ -611,6 +595,4 @@ if ($key.Character -eq 'y' -or $key.Character -eq 'Y') {
     }
 }
 
-
 Write-Host ""
-
