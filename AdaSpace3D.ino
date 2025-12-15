@@ -78,6 +78,10 @@ void blinkError() {
 
 void handleLeds(double totalMove) {
   if (LED_MODE == 0) { // STATIC
+    // Rate-limit: static color doesn't need updating every cycle
+    static unsigned long lastStaticUpdate = 0;
+    if (millis() - lastStaticUpdate < 500) return; // Only refresh every 500ms
+    lastStaticUpdate = millis();
     updateHardwareLeds(LED_COLOR_R, LED_COLOR_G, LED_COLOR_B);
   }
   else if (LED_MODE == 1) { // BREATHING
