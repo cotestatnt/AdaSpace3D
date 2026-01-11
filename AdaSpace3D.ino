@@ -144,6 +144,8 @@ void setup() {
 
 #if DEBUG_MODE
   Serial.begin(115200);
+  while(!Serial) delay(10);
+  Serial.println("AdaSpace3D - Debug Mode Enabled");
 #endif
 
   for(uint8_t i = 0; i < 4; i++) pinMode(physPins[i], INPUT_PULLUP);

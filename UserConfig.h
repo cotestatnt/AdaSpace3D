@@ -50,6 +50,6 @@
 
 // --- DEBUG MODE ---
 // MUST be false for normal use. True = Serial Monitor but NO Driver.
-#define DEBUG_MODE          false
+#define DEBUG_MODE          0
 
 #endif // USER_CONFIG_H
