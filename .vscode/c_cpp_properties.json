@@ -3,7 +3,7 @@
     "configurations": [
         {
             "name": "Arduino",
-            "compilerPath": "C:\\Users\\Tolentino\\AppData\\Local\\Arduino15\\packages\\rp2040\\tools\\pqt-gcc\\4.1.0-1aec55e\\bin\\arm-none-eabi-g++",
+            "compilerPath": "C:\\Users\\cotes\\AppData\\Local\\Arduino15\\packages\\rp2040\\tools\\pqt-gcc\\4.1.0-1aec55e\\bin\\arm-none-eabi-g++",
             "compilerArgs": [
                 "-I",
                 "-Werror=return-type",
@@ -17,24 +17,23 @@
             ],
             "intelliSenseMode": "gcc-x64",
             "includePath": [
-                "C:\\Users\\Tolentino\\AppData\\Local\\Arduino15\\packages\\rp2040\\hardware\\rp2040\\5.4.4\\libraries\\Adafruit_TinyUSB_Arduino\\src\\arduino",
-                "C:\\Users\\Tolentino\\AppData\\Local\\Arduino15\\packages\\rp2040\\hardware\\rp2040\\5.4.4\\include",
-                "C:\\Users\\Tolentino\\AppData\\Local\\Arduino15\\packages\\rp2040\\hardware\\rp2040\\5.4.4\\cores\\rp2040",
-                "C:\\Users\\Tolentino\\AppData\\Local\\Arduino15\\packages\\rp2040\\hardware\\rp2040\\5.4.4\\variants\\rpipico",
-                "C:\\Users\\Tolentino\\Documents\\Arduino\\libraries\\Adafruit_TinyUSB_Library\\src",
-                "C:\\Users\\Tolentino\\AppData\\Local\\Arduino15\\packages\\rp2040\\hardware\\rp2040\\5.4.4\\libraries\\SPI\\src",
-                "C:\\Users\\Tolentino\\Documents\\Arduino\\libraries\\XENSIV_3D_Magnetic_Sensor_TLx493D\\src",
-                "C:\\Users\\Tolentino\\AppData\\Local\\Arduino15\\packages\\rp2040\\hardware\\rp2040\\5.4.4\\libraries\\Wire\\src",
-                "C:\\Users\\Tolentino\\Documents\\Arduino\\libraries\\Adafruit_NeoPixel",
-                "C:\\Users\\Tolentino\\AppData\\Local\\Arduino15\\packages\\rp2040\\tools\\pqt-gcc\\4.1.0-1aec55e\\arm-none-eabi\\include\\c++\\14.3.0",
-                "C:\\Users\\Tolentino\\AppData\\Local\\Arduino15\\packages\\rp2040\\tools\\pqt-gcc\\4.1.0-1aec55e\\arm-none-eabi\\include\\c++\\14.3.0\\arm-none-eabi\\thumb",
-                "C:\\Users\\Tolentino\\AppData\\Local\\Arduino15\\packages\\rp2040\\tools\\pqt-gcc\\4.1.0-1aec55e\\arm-none-eabi\\include\\c++\\14.3.0\\backward",
-                "C:\\Users\\Tolentino\\AppData\\Local\\Arduino15\\packages\\rp2040\\tools\\pqt-gcc\\4.1.0-1aec55e\\lib\\gcc\\arm-none-eabi\\14.3.0\\include",
-                "C:\\Users\\Tolentino\\AppData\\Local\\Arduino15\\packages\\rp2040\\tools\\pqt-gcc\\4.1.0-1aec55e\\lib\\gcc\\arm-none-eabi\\14.3.0\\include-fixed",
-                "C:\\Users\\Tolentino\\AppData\\Local\\Arduino15\\packages\\rp2040\\tools\\pqt-gcc\\4.1.0-1aec55e\\arm-none-eabi\\include"
+                "C:\\Users\\cotes\\AppData\\Local\\Arduino15\\packages\\rp2040\\hardware\\rp2040\\5.4.4\\libraries\\Adafruit_TinyUSB_Arduino\\src\\arduino",
+                "C:\\Users\\cotes\\AppData\\Local\\Arduino15\\packages\\rp2040\\hardware\\rp2040\\5.4.4\\include",
+                "C:\\Users\\cotes\\AppData\\Local\\Arduino15\\packages\\rp2040\\hardware\\rp2040\\5.4.4\\cores\\rp2040",
+                "C:\\Users\\cotes\\AppData\\Local\\Arduino15\\packages\\rp2040\\hardware\\rp2040\\5.4.4\\variants\\rpipico",
+                "C:\\Users\\cotes\\AppData\\Local\\Arduino15\\packages\\rp2040\\hardware\\rp2040\\5.4.4\\libraries\\SPI\\src",
+                "C:\\Users\\cotes\\AppData\\Local\\Arduino15\\packages\\rp2040\\hardware\\rp2040\\5.4.4\\libraries\\Wire\\src",
+                "C:\\Users\\cotes\\OneDrive\\Documenti\\Arduino\\libraries\\Adafruit_NeoPixel",
+                "C:\\Users\\cotes\\AppData\\Local\\Arduino15\\packages\\rp2040\\hardware\\rp2040\\5.4.4\\libraries\\Adafruit_TinyUSB_Arduino\\src",
+                "C:\\Users\\cotes\\AppData\\Local\\Arduino15\\packages\\rp2040\\tools\\pqt-gcc\\4.1.0-1aec55e\\arm-none-eabi\\include\\c++\\14.3.0",
+                "C:\\Users\\cotes\\AppData\\Local\\Arduino15\\packages\\rp2040\\tools\\pqt-gcc\\4.1.0-1aec55e\\arm-none-eabi\\include\\c++\\14.3.0\\arm-none-eabi\\thumb",
+                "C:\\Users\\cotes\\AppData\\Local\\Arduino15\\packages\\rp2040\\tools\\pqt-gcc\\4.1.0-1aec55e\\arm-none-eabi\\include\\c++\\14.3.0\\backward",
+                "C:\\Users\\cotes\\AppData\\Local\\Arduino15\\packages\\rp2040\\tools\\pqt-gcc\\4.1.0-1aec55e\\lib\\gcc\\arm-none-eabi\\14.3.0\\include",
+                "C:\\Users\\cotes\\AppData\\Local\\Arduino15\\packages\\rp2040\\tools\\pqt-gcc\\4.1.0-1aec55e\\lib\\gcc\\arm-none-eabi\\14.3.0\\include-fixed",
+                "C:\\Users\\cotes\\AppData\\Local\\Arduino15\\packages\\rp2040\\tools\\pqt-gcc\\4.1.0-1aec55e\\arm-none-eabi\\include"
             ],
             "forcedInclude": [
-                "C:\\Users\\Tolentino\\AppData\\Local\\Arduino15\\packages\\rp2040\\hardware\\rp2040\\5.4.4\\cores\\rp2040\\Arduino.h"
+                "C:\\Users\\cotes\\AppData\\Local\\Arduino15\\packages\\rp2040\\hardware\\rp2040\\5.4.4\\cores\\rp2040\\Arduino.h"
             ],
             "cStandard": "c11",
             "cppStandard": "c++17",

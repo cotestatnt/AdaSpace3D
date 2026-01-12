@@ -28,8 +28,8 @@
 #define MAG_POWER_PIN       15     
 
 // Button Pins
-#define BUTTON1_PIN         A0
-#define BUTTON2_PIN         A1
+#define BUTTON1_PIN         0
+#define BUTTON2_PIN         1
 #define BUTTON3_PIN         A2
 #define BUTTON4_PIN         A3
 
