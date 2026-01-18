@@ -10,15 +10,16 @@
 #define BOARD_MANUFACTURER "3Dconnexion"
 
 #include "src/TLx493D/TLx493D_inc.hpp"
-#include <Adafruit_NeoPixel.h> // It's included in RP2040 core by default
-#include <Adafruit_TinyUSB.h>
+#include <Adafruit_NeoPixel.h>          
+// It's included in RP2040 core by default
+#include <Adafruit_TinyUSB.h>     
 #include "UserConfig.h"
 
 // --- CONSTANTS ---
 #ifdef PIN_NEOPIXEL
 #undef PIN_NEOPIXEL
 #endif
-#define PIN_NEOPIXEL 4
+#define PIN_NEOPIXEL 16
 
 #define PIN_SIMPLE 25
 #define HANG_THRESHOLD 50           // consecutive identical readings before reset
