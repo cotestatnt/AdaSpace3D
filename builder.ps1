@@ -263,6 +263,18 @@ function Setup-ShadowBuild {
     [System.IO.File]::Copy($sourceSketch, $destSketch, $true)
     [System.IO.File]::Copy($sourceConfig, $destConfig, $true)
     
+    # Copy the src directory (contains TLx493D library)
+    $sourceSrcDir = [System.IO.Path]::Combine($ScriptRoot, "src")
+    $destSrcDir = [System.IO.Path]::Combine($SKETCH_BUILD_DIR, "src")
+    
+    if ([System.IO.Directory]::Exists($sourceSrcDir)) {
+        if ([System.IO.Directory]::Exists($destSrcDir)) {
+            Remove-Item -LiteralPath $destSrcDir -Recurse -Force -ErrorAction SilentlyContinue
+        }
+        Copy-Item -Path $sourceSrcDir -Destination $destSrcDir -Recurse -Force
+        Write-Info "  - src/ (TLx493D library)"
+    }
+    
     Write-Success "Source files copied to shadow build directory!"
     Write-Info "  - $MAIN_SKETCH"
     Write-Info "  - $USER_CONFIG"
@@ -286,23 +298,25 @@ function Compile-Firmware {
     # --- FIXED FLAGS FOR COMPILER ---
     # We now rely on standard build properties which the RP2040 core handles natively.
     
+    # Create a build_opt.h file to define USB strings (avoids PowerShell quoting hell)
+    $buildOptPath = [System.IO.Path]::Combine($SKETCH_BUILD_DIR, "build_opt.h")
+    $buildOptContent = @"
+// Auto-generated USB configuration
+#define USB_VID $USB_VID
+#define USB_PID $USB_PID
+#define USB_MANUFACTURER "$USB_MANUFACTURER"
+#define USB_PRODUCT "$USB_PRODUCT"
+"@
+    [System.IO.File]::WriteAllText($buildOptPath, $buildOptContent)
+    Write-Info "Created build_opt.h with USB descriptors"
+    
     $propVid       = "build.vid=$USB_VID"
     $propPid       = "build.pid=$USB_PID"
-    $propUsbVid    = "build.usbvid=-DUSBD_VID=$USB_VID"
-    $propUsbPid    = "build.usbpid=-DUSBD_PID=$USB_PID"
-    
-    # Careful quoting for properties with spaces
-    $propProduct   = "build.usb_product=\`"$USB_PRODUCT\`""
-    $propMfg       = "build.usb_manufacturer=\`"$USB_MANUFACTURER\`""
     
     # Build the argument string manually to handle paths with spaces correctly
     $argString = "compile --fqbn `"$fqbn`" " +
     "--build-property `"$propVid`" " +
     "--build-property `"$propPid`" " +
-    "--build-property `"$propUsbVid`" " +
-    "--build-property `"$propUsbPid`" " +
-    "--build-property `"$propProduct`" " +
-    "--build-property `"$propMfg`" " +
     "--output-dir `"$outputDir`" " +
     "`"$sketchPath`""
     

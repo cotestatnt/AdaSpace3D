@@ -13,6 +13,7 @@
 #include <Adafruit_NeoPixel.h>          
 // It's included in RP2040 core by default
 #include <Adafruit_TinyUSB.h>     
+#include <math.h>
 #include "UserConfig.h"
 
 // --- CONSTANTS ---
@@ -202,7 +203,11 @@ void setup() {
   digitalWrite(MAG_POWER_PIN, HIGH);
   delay(10);
 
+  Wire1.setSCL(I2C_SCL);
+  Wire1.setSDA(I2C_SDA);
   Wire1.begin();
+
+
   Wire1.setClock(400000);
   if (magCable.begin()) {
     activeSensor = &magCable;
@@ -244,7 +249,7 @@ void loop() {
 
 
   if (activeSensor) {
-    readAndSendMagnetometerData();
+    readAndSendMagnetometerDataTrig();
   }
   delay(2);
 }
@@ -306,6 +311,10 @@ void readAndSendMagnetometerData() {
     if (isfinite(x) && isfinite(y) && isfinite(z))
     {
 
+      double rawX = x;
+      double rawY = y;
+      double rawZ = z;
+
       // --- WATCHDOG LOGIC ---
       // If values are IDENTICAL to last read, sensor might be frozen
       if (x == watchdog.last_x && y == watchdog.last_y && z == watchdog.last_z)
@@ -349,6 +358,39 @@ void readAndSendMagnetometerData() {
       int16_t rx = (int16_t)(y * CONFIG_ROT_SCALE);
       int16_t ry = (int16_t)(x * CONFIG_ROT_SCALE);
 
+      #if DEBUG_MODE
+      static unsigned long lastDebugPrint = 0;
+      unsigned long now = millis();
+      if (now - lastDebugPrint > 20)
+      {
+        lastDebugPrint = now;
+        Serial.print("RAW:");
+        Serial.print(rawX);
+        Serial.print(',');
+        Serial.print(rawY);
+        Serial.print(',');
+        Serial.print(rawZ);
+        Serial.print(" | CAL:");
+        Serial.print(x);
+        Serial.print(',');
+        Serial.print(y);
+        Serial.print(',');
+        Serial.print(z);
+        Serial.print(" | TX:");
+        Serial.print(tx);
+        Serial.print(',');
+        Serial.print(ty);
+        Serial.print(',');
+        Serial.print(tz);
+        Serial.print(" | RX:");
+        Serial.print(rx);
+        Serial.print(',');
+        Serial.print(ry);
+        Serial.print(',');
+        Serial.println(0);
+      }
+      #endif
+
       send_tx_rx_reports(tx, ty, tz, rx, ry, 0);
     }
   }
@@ -359,8 +401,154 @@ void readAndSendMagnetometerData() {
   }
 }
 
+void readAndSendMagnetometerDataTrig() {
+  delay(500);
+  double x, y, z;
+
+  if (PREVENTIVE_RESET_INTERVAL > 0 && millis() - watchdog.lastPreventiveReset > PREVENTIVE_RESET_INTERVAL)
+  {
+    resetMagnetometer();
+    watchdog.lastPreventiveReset = millis();
+    return;
+  }
+
+  if (activeSensor->getMagneticField(&x, &y, &z))
+  {
+    if (isfinite(x) && isfinite(y) && isfinite(z))
+    {
+      double rawX = x;
+      double rawY = y;
+      double rawZ = z;
+
+      if (x == watchdog.last_x && y == watchdog.last_y && z == watchdog.last_z)
+      {
+        watchdog.sameValueCount++;
+        if (watchdog.sameValueCount >= HANG_THRESHOLD)
+        {
+          resetMagnetometer();
+          return;
+        }
+      }
+      else
+      {
+        watchdog.sameValueCount = 0;
+        watchdog.last_x = x;
+        watchdog.last_y = y;
+        watchdog.last_z = z;
+      }
+
+      double yaw = 0.0, baseYaw = 0.0;
+      double pitch = 0.0, basePitch = 0.0;
+
+      if (magCal.calibrated)
+      {
+        double rxy = sqrt(rawX * rawX + rawY * rawY);
+        double r0xy = sqrt(magCal.x_neutral * magCal.x_neutral + magCal.y_neutral * magCal.y_neutral);
+        if (rxy < 1e-6) rxy = 1e-6;
+        if (r0xy < 1e-6) r0xy = 1e-6;
+
+        yaw = atan2(rawY, rawX);
+        baseYaw = atan2(magCal.y_neutral, magCal.x_neutral);
+        pitch = atan2(rawZ, rxy);
+        basePitch = atan2(magCal.z_neutral, r0xy);
+      }
+
+      if (magCal.calibrated)
+      {
+        x -= magCal.x_neutral;
+        y -= magCal.y_neutral;
+        z -= magCal.z_neutral;
+      }
+
+      double totalMove = abs(x) + abs(y) + abs(z);
+      handleLeds(totalMove);
+
+      if (abs(x) < CONFIG_DEADZONE)
+        x = 0.0;
+      if (abs(y) < CONFIG_DEADZONE)
+        y = 0.0;
+      if (abs(z) < CONFIG_ZOOM_DEADZONE)
+        z = 0.0;
+
+      int16_t tx = (int16_t)(-x * CONFIG_TRANS_SCALE);
+      int16_t ty = (int16_t)(-y * CONFIG_TRANS_SCALE);
+      int16_t tz = (int16_t)(z * CONFIG_ZOOM_SCALE);
+
+      double deltaYaw = yaw - baseYaw;
+      double deltaPitch = pitch - basePitch;
+
+      const double PI2 = 2.0 * PI;
+      if (deltaYaw > PI) deltaYaw -= PI2;
+      else if (deltaYaw < -PI) deltaYaw += PI2;
+      if (deltaPitch > PI) deltaPitch -= PI2;
+      else if (deltaPitch < -PI) deltaPitch += PI2;
+
+      const double ANGLE_DEADZONE = 0.01;
+      if (fabs(deltaYaw) < ANGLE_DEADZONE) deltaYaw = 0.0;
+      if (fabs(deltaPitch) < ANGLE_DEADZONE) deltaPitch = 0.0;
+
+      const double ROT_ANGLE_SCALE = 800.0;
+      int16_t rx = (int16_t)(deltaPitch * ROT_ANGLE_SCALE);
+      int16_t ry = (int16_t)(deltaYaw * ROT_ANGLE_SCALE);
+
+      #if DEBUG_MODE
+      static unsigned long lastDebugPrint = 0;
+      unsigned long now = millis();
+      if (now - lastDebugPrint > 20)
+      {
+        lastDebugPrint = now;
+        Serial.print("RAW:");
+        Serial.print(rawX);
+        Serial.print(',');
+        Serial.print(rawY);
+        Serial.print(',');
+        Serial.print(rawZ);
+        Serial.print(" | CAL:");
+        Serial.print(x);
+        Serial.print(',');
+        Serial.print(y);
+        Serial.print(',');
+        Serial.print(z);
+        Serial.print(" | ANG:");
+        Serial.print(deltaYaw);
+        Serial.print(',');
+        Serial.print(deltaPitch);
+        Serial.print(" | TX:");
+        Serial.print(tx);
+        Serial.print(',');
+        Serial.print(ty);
+        Serial.print(',');
+        Serial.print(tz);
+        Serial.print(" | RX:");
+        Serial.print(rx);
+        Serial.print(',');
+        Serial.print(ry);
+        Serial.print(',');
+        Serial.println(0);
+      }
+      #endif
+
+      send_tx_rx_reports(tx, ty, tz, rx, ry, 0);
+    }
+  }
+  else
+  {
+    send_tx_rx_reports(0, 0, 0, 0, 0, 0);
+  }
+}
+
 void setButtonStateHID(uint8_t hidButton, bool pressed)
 {
+  #ifdef DEBUG_MODE
+  if (DEBUG_MODE) {
+    Serial.print("BUTTON ");
+    Serial.print(hidButton);
+    Serial.print(" : ");
+    Serial.println(pressed ? "PRESSED" : "RELEASED");
+    return;
+  }
+  #endif
+
   if (!TinyUSBDevice.mounted())
     return;
   uint8_t report[4] = {0, 0, 0, 0};
@@ -374,6 +562,12 @@ void setButtonStateHID(uint8_t hidButton, bool pressed)
 
 void send_tx_rx_reports(int16_t tx, int16_t ty, int16_t tz, int16_t rx, int16_t ry, int16_t rz)
 {
+  #ifdef DEBUG_MODE
+  if (DEBUG_MODE) {
+    return;
+  }
+  #endif
+
   if (!TinyUSBDevice.mounted() || !usb_hid.ready())
     return;
 

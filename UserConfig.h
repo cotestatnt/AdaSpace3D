@@ -1,9 +1,17 @@
 #ifndef USER_CONFIG_H
 #define USER_CONFIG_H
 
+
+#define I2C_SDA 14
+#define I2C_SCL 15
+
 // ===================================================================================
 //   ADA SPACE 3D - USER CONFIGURATION
 // ===================================================================================
+
+// --- DEBUG MODE ---
+#define DEBUG_MODE          1      // 1 = Print HID values to Serial instead of sending them
+                                   // 0 = Normal mode (send HID reports)
 
 // --- LED CONFIGURATION ---
 // The firmware drives BOTH outputs simultaneously. Connect whichever you like.
@@ -28,10 +36,10 @@
 #define MAG_POWER_PIN       15     
 
 // Button Pins
-#define BUTTON1_PIN         0
-#define BUTTON2_PIN         1
-#define BUTTON3_PIN         A2
-#define BUTTON4_PIN         A3
+#define BUTTON1_PIN         29
+#define BUTTON2_PIN         28
+#define BUTTON3_PIN         27
+#define BUTTON4_PIN         26
 
 // --- SENSOR SETTINGS ---
 // SENSITIVITY: 150.0 is the "Golden" value for this sensor
@@ -47,9 +55,5 @@
 // 0x046d / 0xc626 = SpaceNavigator (Best for DIY compatibility)
 #define USB_VID             0x256f
 #define USB_PID             0xc631
-
-// --- DEBUG MODE ---
-// MUST be false for normal use. True = Serial Monitor but NO Driver.
-#define DEBUG_MODE          0
 
 #endif // USER_CONFIG_H
